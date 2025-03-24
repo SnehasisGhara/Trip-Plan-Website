@@ -1,0 +1,24 @@
+****hotels****
+
+address || location
+description
+imageURL
+name
+price
+rating
+
+
+**** dailyPlans ***
+
+placesToVisit || places_to_visit || activities || places
+details
+imageURL|| image_url || imageUrl
+location || name || place
+ticketPrice || price || ticket_price
+travelTime || travel_time_to_next  || travel_time || travelTimeToNext
+
+sometimes  there are notes 
+
+
+
+

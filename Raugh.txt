@@ -1,0 +1,485 @@
+****Authntucation function for generate trip ::
+
+ // let user = auth.currentUser;
+
+        // if (!user) {
+        //     try {
+        //         const result = await signInWithPopup(auth, provider);
+        //         user = result.user;
+        //         if (!user) throw new Error("User not found after sign-in");
+
+        //         const userRef = doc(firestore, "users", user.uid);
+        //         await setDoc(userRef, {
+        //             uid: user.uid,
+        //             name: user.displayName || "Anonymous",
+        //             email: user.email || "No email",
+        //             profilePic: user.photoURL || "",
+        //             timestamp: new Date(),
+        //         });
+
+        //         toast({
+        //             title: "Success!",
+        //             description: `Welcome, ${user.displayName}! Generating your trip...`,
+        //             variant: "default",
+        //         });
+        //     } catch (error) {
+        //         console.error("Google Sign-in Error:", error);
+        //         toast({
+        //             title: "Authentication Error",
+        //             description: error.message || "Failed to authenticate. Please try again.",
+        //             variant: "destructive",
+        //         });
+        //         setLoading(false)
+        //         return; // Stop execution if authentication fails
+        //     }
+        // }
+
+
+    /////////////////////////
+
+
+
+
+  ********** : Generate trip code : ************************
+
+  const GenerateTrip = async (e) => {
+    e.preventDefault();
+
+    setLoading(true);
+
+    // Check if user is authenticated 
+    if (!auth.currentUser) {
+        toast({
+            title: "Sign In Required",
+            description: "Please sign in first to generate a trip!",
+            variant: "destructive",
+        });
+        setLoading(false);
+        return; // Stop execution if user is not signed in
+    }
+
+    if (!Query || !Duration || !SelectedBudget || !SelectedCompanion) {
+        toast({
+            title: "Missing Information",
+            description: "Please fill in all fields to generate an itinerary!",
+            variant: "destructive",
+        });
+        setLoading(false);
+        return;
+    }
+
+    const prompt = `Generate a JSON response for a travel plan to ${Query} for ${Duration} days with ${SelectedCompanion} on a ${SelectedBudget} budget. The response should include an array of hotels (name, address, price, image URL, coordinates, rating, description) and an itinerary (places to visit, details, image URL, coordinates, ticket price, travel time between locations).`;
+
+    toast({
+        title: "Congratulations!",
+        description: "Your trip is being generated!",
+        variant: "default",
+    });
+
+    try {
+        const apiKey = import.meta.env.VITE_GOOGLE_GEMINI_AI_API_KEY;
+        if (!apiKey) {
+            throw new Error("API key is not configured");
+        }
+
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.0-flash-exp"
+        });
+
+        const result = await model.generateContent(prompt);
+        const tripDataAI = result.response.text();
+        const tripId = Date.now().toString();
+
+        const tripData = {
+            userId: auth.currentUser.uid,
+            location: Query,
+            duration: Duration,
+            budget: SelectedBudget,
+            companion: SelectedCompanion,
+            tripDataAI: tripDataAI,
+            createdAt: new Date(),
+        };
+        const tripRef = await addDoc(collection(firestore, "trips"), tripData);
+      
+        toast({
+            title: "Trip Generated Successfully!",
+            description: "Redirecting to your trip details...",
+            variant: "default",
+        });
+        navigate(`/view-trip/${tripRef.id}`);
+        setLoading(false)
+    } catch (error) {
+        console.error("Error generating trip plan:", error);
+        toast({
+            title: "Error",
+            description: error.message || "Failed to generate trip plan. Please try again.",
+            variant: "destructive",
+        });
+        setLoading(false);
+    }
+};
+
+
+******** :Trip(): ********************
+
+const Trip = () => {
+
+  const { tripId } = useParams();
+  const [tripData, settripData] = useState(null)
+  const [loading, setloading] = useState(null)
+
+  useEffect(() => {
+    const fetchTrip = async () => {
+      try {
+        const tripRef = doc(firestore, "trips", tripId);
+        const tripSnap = await getDoc(tripRef);
+        if (tripSnap.exists()) {
+          settripData(tripSnap.data())
+        } else {
+          console.error("Trip Not Found");
+        }
+        setloading(false)
+      } catch (error) {
+        console.error("Error fetching trip:", error);
+        setloading(false);
+      }
+    }
+    fetchTrip()
+  }, [tripId])
+  if (loading) return <p>Loading trip details...</p>;
+  if (!tripData) return <p>Trip not found.</p>;
+
+  return (
+    <div className='p-10 md:px-20 lg:px-44 xl:px-40 bg-slate-500 h-screen '>
+      <div className='pt-20 '>
+        {/* Information Section*/}
+        <InformationSection trip={trip}/>
+        {/* Recommended Hotel */}
+        {/* Daily Plan */}
+        {/* Footer  */}
+      </div>
+
+    </div>
+  )
+}
+
+export default Trip
+
+
+*********** : InformationSection : ****************
+
+
+const InformationSection = ({ trip }) => {
+  // Check if trip is undefined
+  if (!trip) {
+    return <p>Loading trip details...</p>; // Prevent error if trip is undefined
+  }
+
+  return (
+    <div className="h-[400px] mx-auto bg-white shadow-lg rounded-xl overflow-hidden">
+      {/* Image */}
+      <img src={MainPicture} alt="Trip" className="w-full h-[250px] object-cover" />
+
+      {/* Trip Details */}
+      <div className="p-5">
+        <h2 className="text-2xl font-bold text-gray-800">{trip.location || "Trip Name"}</h2>
+        
+
+        <div className="flex justify-between bg-gray-100 p-3 mt-3 rounded-lg">
+          <span className="text-sm font-semibold">Days: {trip.duration || "N/A"}</span>
+          <span className="text-sm font-semibold">Budget: {trip.budget || "N/A"}</span>
+          <span className="text-sm font-semibold">Companion: {trip.companion || "N/A"}</span>
+        </div>
+
+        {/* Travel Plan */}
+        {trip.travelPlan && (
+          <div className="mt-4 p-3 bg-gray-200 rounded-lg">
+            <h3 className="font-semibold">Travel Plan:</h3>
+            <p className="text-sm text-gray-600">{trip.travelPlan}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
+***** JSON ******
+
+itinerary
+: 
+Array(7)
+0
+: 
+coordinates
+: 
+{latitude: 12.9716, longitude: 77.5946}
+day
+: 
+1
+details
+: 
+"Arrive in Bangalore, check into the hotel. Visit Lal Bagh Botanical Garden, Bangalore Palace, and Vidhana Soudha.  Enjoy dinner at a local restaurant."
+imageUrl
+: 
+"https://example.com/bangalore_palace.jpg"
+location
+: 
+"Bangalore - Arrival & Local Sightseeing"
+ticketPrice
+: 
+Bangalore Palace
+: 
+250
+Lal Bagh
+: 
+30
+[[Prototype]]
+: 
+Object
+travelTimeBetweenLocations
+: 
+Airport to Hotel
+: 
+"1 hour (depending on traffic)"
+Lal Bagh to Bangalore Palace
+: 
+"30 minutes"
+
+********************DailyPlans*****************
+
+// import React, { useState, useEffect } from 'react';
+
+// // const UNSPLASH_ACCESS_KEY = import.meta.env.VITE_PHOTO_ACCESS_KEY;
+
+// const DailyPlans = ({ dailyPlans }) => {
+//   console.log("Received dailyPlans:", dailyPlans);
+  
+
+//   return (
+//     <div className="mt-10">
+//       <h2 className="text-2xl font-bold mb-4">Daily Plans</h2>
+//       {dailyPlans?.map((dayPlan, index) => {
+//         const places = dayPlan.placesToVisit || dayPlan.places_to_visit || dayPlan.activities || dayPlan.places || dayPlan.location || [];
+
+//         return (
+//           <div key={index} className="p-4 border rounded-lg mb-6 shadow">
+//             <h3 className="text-xl font-semibold">Day {dayPlan.day || index + 1}</h3>
+
+//             {dayPlan.details && <p className="text-gray-700 mt-2">{dayPlan.details}</p>}
+
+//             {dayPlan.imageURL || dayPlan.image_url || dayPlan.imageUrl ? (
+//               <img
+//                 src={dayPlan.imageURL || dayPlan.image_url || dayPlan.imageUrl}
+//                 alt="Trip Image"
+//                 className="w-full h-40 object-cover rounded-lg mt-2"
+//               />
+//             ) : (
+//               <p className="text-gray-500 mt-2">No Image Available</p>
+//             )}
+
+//             <div className="mt-2 space-y-4">
+//               {places.length > 0 ? (
+//                 places.map((place, i) => {
+//                   const location = place.location || place.name || place.place || "Unknown Location";
+//                   const image = place.imageURL || place.image_url || place.imageUrl || null;  //  imageMap[location] ||
+//                   const ticketPrice = place.ticketPrice || place.price || place.ticket_price || "N/A";
+//                   const travelTime = place.travelTime || place.travel_time_to_next || place.travel_time || place.travelTimeToNext || "N/A";
+
+//                   return (
+//                     <div key={i} className="p-3 border rounded-lg shadow-sm">
+//                       <h4 className="text-lg font-medium">{location}</h4>
+
+//                       {/* Render Image if available */}
+//                       {image ? (
+//                         <img
+//                           src={image}
+//                           alt={location}
+//                           className="w-full h-40 object-cover rounded-lg mt-2"
+//                         />
+//                       ) : (
+//                         <p className="text-gray-500 mt-2">No Image Available</p>
+//                       )}
+
+//                       {/* Render Place Details */}
+//                       {place.details && <p className="text-gray-700 mt-2">{place.details}</p>}
+
+//                       {/* Render Ticket Price & Travel Time */}
+//                       {ticketPrice !== "N/A" || travelTime !== "N/A" ? (
+//                         <p className="text-sm text-gray-500 mt-1">
+//                           <strong>🎟 Ticket Price:</strong> {ticketPrice} |{" "}
+//                           <strong>🕒 Travel Time:</strong> {travelTime}
+//                         </p>
+//                       ) : null}
+//                     </div>
+//                   );
+//                 })
+//               ) : (
+//                 <p className="text-gray-500">No specific places listed for this day.</p>
+//               )}
+//             </div>
+//           </div>
+//         );
+//       })}
+//     </div>
+//   );
+// };
+
+// export default DailyPlans;
+
+
+
+******Updated Headerfile***************8
+
+import { signInWithPopup, signOut } from "firebase/auth";
+import { auth } from "../Firebase/Firebase";
+import React, { useState, useEffect } from "react";
+import { provider } from "../Firebase/Firebase";
+import { toast } from "@/hooks/use-toast";
+import { doc, setDoc } from "firebase/firestore";
+import { firestore } from "../Firebase/Firebase";
+import { useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+const Header = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Listen for auth state changes
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const userRef = doc(firestore, "trips", user.uid);
+      await setDoc(userRef, {
+        name: user.displayName,
+        email: user.email,
+        profilePic: user.photoURL,
+        uid: user.uid,
+      });
+
+      if (typeof toast.success === 'function') {
+        toast.success(`Welcome, ${user.displayName}`);
+      }
+      setIsOpen(false);
+    } catch (error) {
+      console.error("Sign-in error:", error);
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast.info("Sign-in popup was closed. Please try again.");
+      } else if (typeof toast.error === 'function') {
+        toast.error("Failed to sign in. Please try again.");
+      }
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      toast.success("Signed out successfully");
+      navigate('/'); // Redirect to home page
+    } catch (error) {
+      toast.error("Failed to sign out");
+    }
+  };
+
+  return (
+    <nav className="absolute top-0 left-0 w-full z-20 bg-transparent">
+      <div className="flex justify-between items-center px-4 sm:px-8 py-2 lg:py-4">
+        {/* Logo */}
+        <img src="Logo1.png" alt="Logo" className="w-20 sm:w-24 h-auto" />
+
+        {/* Navigation Items - Only show when user is logged in */}
+        {user && (
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              className="bg-white/20 backdrop-blur-sm"
+              onClick={() => navigate('/hotels-cart')}
+            >
+              Hotels Cart
+            </Button>
+            <Button
+              variant="outline"
+              className="bg-white/20 backdrop-blur-sm"
+              onClick={() => navigate('/trip-history')}
+            >
+              Trip History
+            </Button>
+          </div>
+        )}
+
+        {/* Sign-In Button or User Profile */}
+        {!user ? (
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-blue-500 hover:to-green-500 text-white font-signature font-bold px-6 sm:px-8 py-2 sm:py-3 rounded-full transition-transform hover:scale-105">
+                Sign In
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="w-80 p-6">
+              <DialogHeader className="text-lg font-bold text-center">Sign In</DialogHeader>
+              <div className="flex flex-col items-center gap-4">
+                <Button
+                  onClick={handleGoogleSignIn}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border w-full justify-center bg-black"
+                >
+                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Logo" className="w-6 h-6" />
+                  <span className="text-yellow-100">Continue with Google</span>
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        ) : (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                <img
+                  src={user.photoURL}
+                  alt="Profile"
+                  className="h-10 w-10 rounded-full object-cover"
+                />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56" align="end">
+              <div className="flex flex-col space-y-2">
+                <p className="text-sm font-medium">{user.displayName}</p>
+                <p className="text-xs text-gray-500">{user.email}</p>
+                <hr />
+                <Button
+                  variant="destructive"
+                  onClick={handleSignOut}
+                  className="w-full"
+                >
+                  Sign Out
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
+      </div>
+    </nav>
+  );
+};
+
+export default Header;
