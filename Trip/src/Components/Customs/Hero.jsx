@@ -2,11 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-const Hero = () => {  
- 
+const Hero = () => {
+
 
   return (
-    <div className="relative min-h-screen bg-slate-800 flex items-center justify-center">
+    <div className="relative min-h-screen bg-slate-800 flex flex-col items-center justify-center">
       {/* Background Image */}
       <img
         src="Heropage.jpg"
@@ -24,11 +24,15 @@ const Hero = () => {
         </p>
 
         {/* Get Started Button */}
-        <Link to={"/Create_trip" } >
+        <Link to={"/Create_trip"} >
           <button className="mt-4 bg-gradient-to-r from-red-500 via-orange-700 to-yellow-950 hover:text-black text-slate-100 font-bold py-2 sm:py-3 md:py-4 px-6 sm:px-8 md:px-10 rounded-full text-lg sm:text-xl md:text-2xl transition duration-500 ease-in-out font-signature">
             Get Started
           </button>
         </Link>
+      </div>
+      {/* Copyright Section */}
+      <div className="relative z-10 text-white text-sm sm:text-base mt-10">
+        © {new Date().getFullYear()} Snehasis Ghara. All Rights Reserved.
       </div>
     </div>
   );
