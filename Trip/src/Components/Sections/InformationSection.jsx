@@ -29,7 +29,7 @@ const InformationSection = ({ trip }) => {
       )}
 
       {/* Trip Details */}
-      <div className="p-4 sm:p-6">
+      <div className="p-4 sm:p-5 ">
         <h2 className="text-2xl font-signature sm:text-3xl font-bold text-gray-800 mb-4 hover:text-blue-600 transition-colors">
           {trip.location || "Trip Name"}
         </h2>

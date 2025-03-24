@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { toast } from "react-hot-toast";
+
 
 const Hero = () => {
 
@@ -16,7 +16,7 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 text-center flex flex-col items-center justify-center px-4 py-8 max-w-md lg:max-w-3xl mx-4 bg-white/30 border border-white/30 rounded-2xl lg:min-h-[60vh] shadow-2xl shadow-slate-900">
-        <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-700 to-yellow-950 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold mb-4 font-signature p-2">
+        <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-700 to-yellow-950 text-2xl sm:text-3xl md:text-4xl  font-semibold mb-4 font-signature p-2">
           Explore the World Your Way: Intuitive Travel Planning with AI.
         </h1>
         <p className="text-lg sm:text-xl md:text-2xl font-medium font-signature">

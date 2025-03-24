@@ -116,13 +116,13 @@ const Trip = () => {
   }, [tripId]);
 
   return (
-    <div className='min-h-screen bg-gray-900/95 pt-28 p-6 md:p-10 lg:p-16'>
+    <div className='min-h-screen bg-gray-900/95 pt-28 p-6  lg:p-14'>
       {loading ? (
         <div className="flex justify-center items-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-400"></div>
         </div>
       ) : trip ? (
-        <div className="max-w-7xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto space-y-8 m-10">
           <InformationSection trip={trip} />
 
           {/* Hotels Section */}
