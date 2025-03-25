@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "../../hooks/use-toast"
 // import { triggerGeminiAPI } from "../Service/AIModel"
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { signInWithPopup } from 'firebase/auth';

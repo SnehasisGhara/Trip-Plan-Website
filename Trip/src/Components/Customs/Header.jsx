@@ -2,11 +2,12 @@ import { signInWithPopup, signOut } from "firebase/auth";
 import { auth, provider, firestore } from "../Firebase/Firebase";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "@/hooks/use-toast";
+// import { toast } from "@/hooks/use-toast";
+import { toast } from "../../hooks/use-toast";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/Components/ui/Dialog";
-import { Button } from "@/Components/ui/Button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/Popover";
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/Components/ui/dialog";
+import { Button } from "@/Components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover";
 import { useCart } from "../Context/CartContext";
 
 // i want in header section , after authentication  update header with user profile picture , and when header ujpdate  saw the extra two button one hotels cart and another is trip history .  by shadcn using  popover component for logout funtion when clicking user profile   ,also when user logout irs redirect home page  

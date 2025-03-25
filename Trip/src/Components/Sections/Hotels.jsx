@@ -1,7 +1,7 @@
 import React from "react";
 import useFetchPhotoApi from "../Photo_API/FetchPhotoApi";
 import { useCart } from "../Context/CartContext";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "../../hooks/use-toast";
 
 const HotelCard = ({ hotel }) => {
   const { imageUrl, loading } = useFetchPhotoApi(`${hotel.name} hotel luxury`);
