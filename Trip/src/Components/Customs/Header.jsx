@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 // import { toast } from "@/hooks/use-toast";
 import { toast } from "../../hooks/use-toast";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/Components/ui/dialog";
+import { Dialog,DialogTitle, DialogContent, DialogHeader, DialogTrigger } from "@/Components/ui/dialog";
 import { Button } from "@/Components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover";
 import { useCart } from "../Context/CartContext";
@@ -155,7 +155,10 @@ const Header = () => {
                 </Button>
               </DialogTrigger>
               <DialogContent className="w-80 p-6">
-                <DialogHeader className="text-lg font-bold text-center">Sign In</DialogHeader>
+                <DialogHeader>
+                  <DialogTitle className="text-lg font-bold text-center">Sign In</DialogTitle>
+                </DialogHeader>
+
                 <div className="flex flex-col items-center gap-4">
                   <Button
                     onClick={handleGoogleSignIn}

@@ -11,13 +11,13 @@ import { getFirestore } from "firebase/firestore"; // Import Firestore
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 // Public-facing name for project :project-492724399931
 const firebaseConfig = {
-    apiKey: "AIzaSyAy-ExheqmmBDh_t0o_YfuycGV2Tvc6IbY",
-    authDomain: "ai-based--trip-plan.firebaseapp.com",
-    projectId: "ai-based--trip-plan",
-    storageBucket: "ai-based--trip-plan.firebasestorage.app",
-    messagingSenderId: "492724399931",
-    appId: "1:492724399931:web:18b34b0ab25790f18c511e",
-    measurementId: "G-J2Y5G7DL10",
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain:import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket:import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId:import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId:import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId:import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
     // databaseURL: "https://ai-based--trip-plan-default-rtdb.firebaseio.com"
 };
 
