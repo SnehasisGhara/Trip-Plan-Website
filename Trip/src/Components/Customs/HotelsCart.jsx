@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCart } from '../Context/CartContext';
-import { Button } from '@/components/ui/button.jsx';
+import { Button } from '@/Components/ui/Button';
 
 const HotelsCart = () => {
     const { cart, removeFromCart } = useCart();

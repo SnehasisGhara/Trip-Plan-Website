@@ -4,9 +4,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog.jsx";
-import { Button } from "@/components/ui/button.jsx";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover.jsx";
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/Components/ui/Dialog";
+import { Button } from "@/Components/ui/Button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/Popover";
 import { useCart } from "../Context/CartContext";
 
 // i want in header section , after authentication  update header with user profile picture , and when header ujpdate  saw the extra two button one hotels cart and another is trip history .  by shadcn using  popover component for logout funtion when clicking user profile   ,also when user logout irs redirect home page  
